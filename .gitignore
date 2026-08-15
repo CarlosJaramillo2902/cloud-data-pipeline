@@ -1,0 +1,12 @@
+# Secrets - NEVER commit credentials
+.env
+# Python
+__pycache__/
+*.pyc
+.venv/
+# Data and outputs
+output/
+*.csv
+*.parquet
+# Jupyter
+.ipynb_checkpoints/
