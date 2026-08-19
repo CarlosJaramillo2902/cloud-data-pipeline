@@ -19,12 +19,12 @@ s3_client = boto3.client(
 )
 
 bucket_name = "practice-datalake-carlos-jaramillo"           # Change to your bucket name
-source_key = "optimized_zone/restaurants_processed.parquet"
+source_key = "raw_zone/restaurants_raw.csv"
 
 # --- Download the S3 object into memory (no local disk write) ---
 try:
     obj = s3_client.get_object(Bucket=bucket_name, Key=source_key)
-    df = pd.read_parquet(io.BytesIO(obj["Body"].read()))
+    df = pd.read_csv(io.BytesIO(obj["Body"].read()))
     print(df.info())
 except ClientError as e:
     raise SystemExit(f"Error reading the object from S3: {e}")
@@ -37,13 +37,13 @@ print("File transformed and saved as restaurants_processed.parquet")
 con = duckdb.connect()
 result = con.execute(
     """
-    SELECT SUM(ROUND(COUNT(*))) OVER () AS 'Total Restaurantes', COUNT(*) AS 'Total Restaurantes por Categoría', categories AS Categoría, ROUND(AVG(distance), 1) AS 'Distancia Promedio'
+    SELECT name, distance
     FROM 'output/restaurants_processed.parquet'
-    GROUP BY categories
-    ORDER BY 3 ASC
+    WHERE distance < 500
+    ORDER BY distance ASC
     """
 ).df()
 
-result.to_parquet("./output/category_kpis.parquet", index=False)
+print("Analytical result (restaurants closer than 500 m):")
 print(result)
 con.close()

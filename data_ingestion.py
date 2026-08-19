@@ -51,9 +51,22 @@ print(df_clean.head())
 # Make sure the output folder exists
 os.makedirs("./output", exist_ok=True)
 
+# --- Dataframe Cleansing ---
+df_clean = df_clean.dropna(subset=["latitude","longitude"])
+df_clean = df_clean[df_clean["distance"] >= 0]
+
+df_clean["categories"] = df_clean["categories"].apply(
+    lambda x: x[0]["name"] if isinstance(x, list) and len(x) > 0 else None
+)
+
+cantidad_nulos = df_clean.isna().any(axis=1).sum()
+if cantidad_nulos > (len(df_clean)*0.2): 
+    sys.exit("Los datos no cumplen con la mínima calidad solicitada...\n" 
+             "Más del 20% son registros no válidos...")
+
 # Save the raw dataset locally
-df_clean.to_csv("./output/restaurants_raw.csv", index=False)
-print("File './output/restaurants_raw.csv' generated successfully.")
+df_clean.to_parquet("./output/restaurants_raw.parquet", index=False)
+print("File './output/restaurants_raw.parquet' generated successfully.")
 
 # --- Geospatial visualization (optional) ---
 try:

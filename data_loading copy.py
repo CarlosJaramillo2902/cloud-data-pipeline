@@ -16,8 +16,8 @@ s3_client = boto3.client(
 )
 
 bucket_name = "practice-datalake-carlos-jaramillo"          # Change to your bucket name
-local_file = "output/category_kpis.parquet"
-path_s3 = "consumption_zone/category_kpis.parquet"  # "Folders" in S3 are key prefixes
+local_file = "output/restaurants_raw.parquet"
+path_s3 = "optimized_zone/restaurants_processed.parquet"  # "Folders" in S3 are key prefixes
 
 # Check that the local file exists before uploading
 if not os.path.isfile(local_file):
